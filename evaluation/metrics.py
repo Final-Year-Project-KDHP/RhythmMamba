@@ -102,6 +102,8 @@ def calculate_metrics(predictions, labels, config):
         raise ValueError('Metrics.py evaluation only supports train_and_test and only_test!')
     
     if config.INFERENCE.EVALUATION_METHOD == "FFT":
+        print("Ground Truths:", list(gt_hr_fft_all))
+        print("Predicted Heart Rates:", list(predict_hr_fft_all))
         gt_hr_fft_all = np.array(gt_hr_fft_all)
         predict_hr_fft_all = np.array(predict_hr_fft_all)
         SNR_all = np.array(SNR_all)
@@ -132,18 +134,18 @@ def calculate_metrics(predictions, labels, config):
                 pass
             elif "BA" in metric:  
                 compare = BlandAltman(gt_hr_fft_all, predict_hr_fft_all, config, averaged=True)
-                compare.scatter_plot(
-                    x_label='GT PPG HR [bpm]',
-                    y_label='rPPG HR [bpm]',
-                    show_legend=True, figure_size=(5, 5),
-                    the_title=f'{filename_id}_FFT_BlandAltman_ScatterPlot',
-                    file_name=f'{filename_id}_FFT_BlandAltman_ScatterPlot.pdf')
-                compare.difference_plot(
-                    x_label='Difference between rPPG HR and GT PPG HR [bpm]',
-                    y_label='Average of rPPG HR and GT PPG HR [bpm]',
-                    show_legend=True, figure_size=(5, 5),
-                    the_title=f'{filename_id}_FFT_BlandAltman_DifferencePlot',
-                    file_name=f'{filename_id}_FFT_BlandAltman_DifferencePlot.pdf')
+                # compare.scatter_plot(
+                #     x_label='GT PPG HR [bpm]',
+                #     y_label='rPPG HR [bpm]',
+                #     show_legend=True, figure_size=(5, 5),
+                #     the_title=f'{filename_id}_FFT_BlandAltman_ScatterPlot',
+                #     file_name=f'{filename_id}_FFT_BlandAltman_ScatterPlot.pdf')
+                # compare.difference_plot(
+                #     x_label='Difference between rPPG HR and GT PPG HR [bpm]',
+                #     y_label='Average of rPPG HR and GT PPG HR [bpm]',
+                #     show_legend=True, figure_size=(5, 5),
+                #     the_title=f'{filename_id}_FFT_BlandAltman_DifferencePlot',
+                #     file_name=f'{filename_id}_FFT_BlandAltman_DifferencePlot.pdf')
             else:
                 raise ValueError("Wrong Test Metric Type")
     elif config.INFERENCE.EVALUATION_METHOD == "peak detection":
