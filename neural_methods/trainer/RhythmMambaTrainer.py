@@ -68,12 +68,14 @@ class RhythmMambaTrainer(BaseTrainer):
                 labels = labels.to(self.device)
 
                 self.optimizer.zero_grad()
-                pred_ppg = self.model(data)
-                pred_ppg = (pred_ppg-torch.mean(pred_ppg, axis=-1).view(-1, 1))/torch.std(pred_ppg, axis=-1).view(-1, 1)    # normalize
+                rspo2 = self.model(data)
+                # pred_ppg = (pred_ppg-torch.mean(pred_ppg, axis=-1).view(-1, 1))/torch.std(pred_ppg, axis=-1).view(-1, 1)    # normalize
 
                 loss = 0.0
                 for ib in range(N):
-                    loss = loss + self.criterion(pred_ppg[ib], labels[ib], epoch , self.config.TRAIN.DATA.FS , self.diff_flag)
+                    rspo2_value = torch.tensor(rspo2[bb].item(), device=labels[bb].device) if not isinstance(rspo2[bb], torch.Tensor) else rspo2[bb]
+                    label_value = labels[bb].mean().float()
+                    loss = loss + torch.sqrt(F.mse_loss(rspo2_value, label_value))
                 loss = loss / N
                 loss.backward()
                 self.optimizer.step()
@@ -110,14 +112,15 @@ class RhythmMambaTrainer(BaseTrainer):
                 vbar.set_description("Validation")
                 data_valid, labels_valid = valid_batch[0].to(self.device), valid_batch[1].to(self.device)
                 N, D, C, H, W = data_valid.shape
-                pred_ppg_valid = self.model(data_valid)
-                pred_ppg_valid = (pred_ppg_valid-torch.mean(pred_ppg_valid, axis=-1).view(-1, 1))/torch.std(pred_ppg_valid, axis=-1).view(-1, 1)    # normalize
+                rspo2 = self.model(data_valid)
+                # rspo2 = (rspo2-torch.mean(rspo2, axis=-1).view(-1, 1))/torch.std(rspo2, axis=-1).view(-1, 1)    # normalize
                 for ib in range(N):
-                    loss = self.criterion(pred_ppg_valid[ib], labels_valid[ib], self.config.TRAIN.EPOCHS , self.config.VALID.DATA.FS , self.diff_flag)
-                    valid_loss.append(loss.item())
+                    rspo2_value = torch.tensor(rspo2[bb].item(), device=labels_valid[bb].device) if not isinstance(rspo2[bb], torch.Tensor) else rspo2[bb]
+                    label_value = labels_valid[bb].mean().float()
+                    valid_loss.append(F.mse_loss(rspo2_value, label_value))
                     valid_step += 1
                     vbar.set_postfix(loss=loss.item())
-        return np.mean(np.asarray(valid_loss))
+        return torch.mean(torch.tensor(valid_loss))
 
 
     def test(self, data_loader):

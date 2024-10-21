@@ -303,6 +303,8 @@ class RhythmMamba(nn.Module):
             )
         )
 
+        self.fc = nn.Linear(160, 1)  # Reduces [B, 1, 160] to [B, 1]
+
 
     def forward(self, x):
         B, D, C, H, W = x.shape
@@ -326,5 +328,6 @@ class RhythmMamba(nn.Module):
         rPPG = self.upsample(rPPG)
         rPPG = self.ConvBlockLast(rPPG)    #[N, 1, D]
         rPPG = rPPG.squeeze(1)
+        output = self.fc(rPPG)
 
-        return rPPG
+        return output
