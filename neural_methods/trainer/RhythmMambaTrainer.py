@@ -3,6 +3,7 @@ import os
 import numpy as np
 import torch
 import torch.optim as optim
+import torch.nn.functional as F
 import random
 from tqdm import tqdm
 from evaluation.post_process import calculate_hr
@@ -72,7 +73,7 @@ class RhythmMambaTrainer(BaseTrainer):
                 # pred_ppg = (pred_ppg-torch.mean(pred_ppg, axis=-1).view(-1, 1))/torch.std(pred_ppg, axis=-1).view(-1, 1)    # normalize
 
                 loss = 0.0
-                for ib in range(N):
+                for bb in range(N):
                     rspo2_value = torch.tensor(rspo2[bb].item(), device=labels[bb].device) if not isinstance(rspo2[bb], torch.Tensor) else rspo2[bb]
                     label_value = labels[bb].mean().float()
                     loss = loss + torch.sqrt(F.mse_loss(rspo2_value, label_value))
@@ -114,12 +115,12 @@ class RhythmMambaTrainer(BaseTrainer):
                 N, D, C, H, W = data_valid.shape
                 rspo2 = self.model(data_valid)
                 # rspo2 = (rspo2-torch.mean(rspo2, axis=-1).view(-1, 1))/torch.std(rspo2, axis=-1).view(-1, 1)    # normalize
-                for ib in range(N):
+                for bb in range(N):
                     rspo2_value = torch.tensor(rspo2[bb].item(), device=labels_valid[bb].device) if not isinstance(rspo2[bb], torch.Tensor) else rspo2[bb]
                     label_value = labels_valid[bb].mean().float()
                     valid_loss.append(F.mse_loss(rspo2_value, label_value))
                     valid_step += 1
-                    vbar.set_postfix(loss=loss.item())
+                    # vbar.set_postfix(loss=loss.item())
         return torch.mean(torch.tensor(valid_loss))
 
 
