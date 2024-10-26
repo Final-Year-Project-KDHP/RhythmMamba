@@ -153,26 +153,34 @@ class RhythmMambaTrainer(BaseTrainer):
         self.model = self.model.to(self.config.DEVICE)
         self.model.eval()
         with torch.no_grad():
-            predictions = dict()
-            labels = dict()
+            predictions = list()
+            labels = list()
+            test_loss = list()
             for _, test_batch in enumerate(data_loader['test']):
                 batch_size = test_batch[0].shape[0]
                 chunk_len = self.chunk_len
                 data_test, labels_test = test_batch[0].to(self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
-                pred_ppg_test = self.model(data_test)
-                pred_ppg_test = (pred_ppg_test-torch.mean(pred_ppg_test, axis=-1).view(-1, 1))/torch.std(pred_ppg_test, axis=-1).view(-1, 1)    # normalize
-                labels_test = labels_test.view(-1, 1)
-                pred_ppg_test = pred_ppg_test.view( -1 , 1)
+                rspo2 = self.model(data_test)
+                # pred_ppg_test = (pred_ppg_test-torch.mean(pred_ppg_test, axis=-1).view(-1, 1))/torch.std(pred_ppg_test, axis=-1).view(-1, 1)    # normalize
+                # labels_test = labels_test.view(-1, 1)
+                # pred_ppg_test = pred_ppg_test.view( -1 , 1)
                 for ib in range(batch_size):
                     subj_index = test_batch[2][ib]
                     sort_index = int(test_batch[3][ib])
-                    if subj_index not in predictions.keys():
-                        predictions[subj_index] = dict()
-                        labels[subj_index] = dict()
-                    predictions[subj_index][sort_index] = pred_ppg_test[ib * chunk_len:(ib + 1) * chunk_len]
-                    labels[subj_index][sort_index] = labels_test[ib * chunk_len:(ib + 1) * chunk_len]
+                    # if subj_index not in predictions.keys():
+                    #     predictions[subj_index] = dict()
+                    #     labels[subj_index] = dict()
+                    predictions.append(rspo2[ib].item())
+                    labels.append(labels_test[ib].mean().float().item())
+                    rspo2_value = torch.tensor(rspo2[ib].item(), device=labels_test[ib].device) if not isinstance(rspo2[ib], torch.Tensor) else rspo2[ib]
+                    label_value = labels_test[ib].mean().float()
+                    test_loss.append(F.mse_loss(rspo2_value, label_value))
             print(' ')
-            calculate_metrics(predictions, labels, self.config)
+            print(labels)
+            print(predictions)
+            print()
+            print(torch.mean(torch.tensor(test_loss)))
+            # calculate_metrics(predictions, labels, self.config)
 
 
     def save_model(self, index):
