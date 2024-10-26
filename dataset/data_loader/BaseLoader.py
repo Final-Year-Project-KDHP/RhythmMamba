@@ -447,6 +447,7 @@ class BaseLoader(Dataset):
         file_list_dict = manager.dict()  # dictionary for all processes to store processed files
         p_list = []  # list of processes
         running_num = 0  # number of running processes
+        print(data_dirs)
 
         # in range of number of files to process
         for i in choose_range:
@@ -454,20 +455,22 @@ class BaseLoader(Dataset):
             while process_flag:  # ensure that every i creates a process
                 if running_num < multi_process_quota:  # in case of too many processes
                     # send data to be preprocessing task
+                    print("Process Created:", i)
                     p = Process(target=self.preprocess_dataset_subprocess, 
                                 args=(data_dirs,config_preprocess, i, file_list_dict))
                     p.start()
-                    p_list.append(p)
+                    p_list.append((p, i))
                     running_num += 1
                     process_flag = False
-                for p_ in p_list:
+                for p_, idx in p_list:
                     if not p_.is_alive():
-                        p_list.remove(p_)
+                        p_list.remove((p_, idx))
                         p_.join()
                         running_num -= 1
+                        print(f"Process Finished: {idx}")
                         pbar.update(1)
         # join all processes
-        for p_ in p_list:
+        for p_, idx in p_list:
             p_.join()
             pbar.update(1)
         pbar.close()
