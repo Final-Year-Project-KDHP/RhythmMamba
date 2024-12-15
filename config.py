@@ -11,8 +11,6 @@ from yacs.config import CfgNode as CN
 
 _C = CN()
 
-_C.VID_IDX = 0
-
 # Base config files
 _C.BASE = ['']
 # -----------------------------------------------------------------------------
@@ -213,6 +211,8 @@ _C.TEST.DATA.PREPROCESS.BIGSMALL.RESIZE.BIG_W = 144
 _C.TEST.DATA.PREPROCESS.BIGSMALL.RESIZE.BIG_H = 144
 _C.TEST.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_W = 9
 _C.TEST.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_H = 9
+
+_C.TEST.DATA.VID_IDX = 0
 
 # -----------------------------------------------------------------------------
 # Unsupervised method settings
