@@ -125,13 +125,13 @@ class RhythmMambaTrainer(BaseTrainer):
         if data_loader["test"] is None:
             raise ValueError("No data for test")
 
-        print('')
-        print("===Testing===")
+        # print('')
+        # print("===Testing===")
         if self.config.TOOLBOX_MODE == "only_test":
             if not os.path.exists(self.config.INFERENCE.MODEL_PATH):
                 raise ValueError("Inference model path error! Please check INFERENCE.MODEL_PATH in your yaml.")
             self.model.load_state_dict(torch.load(self.config.INFERENCE.MODEL_PATH))
-            print("Testing uses pretrained model!")
+            # print("Testing uses pretrained model!")
         else:
             if self.config.TEST.USE_LAST_EPOCH:
                 last_epoch_model_path = os.path.join(
@@ -168,6 +168,11 @@ class RhythmMambaTrainer(BaseTrainer):
                     predictions[subj_index][sort_index] = pred_ppg_test[ib * chunk_len:(ib + 1) * chunk_len]
                     labels[subj_index][sort_index] = labels_test[ib * chunk_len:(ib + 1) * chunk_len]
             print(' ')
+
+            plot_data = {"pd": predictions[list(predictions.keys())[0]][2].cpu().numpy(),
+                          "gt": labels[list(predictions.keys())[0]][2].cpu().numpy()}
+            np.savez("/content/plot_data.npz", pd=plot_data["pd"], gt=plot_data["gt"])
+            
             calculate_metrics(predictions, labels, self.config)
 
 
