@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import torch
 from evaluation.post_process import *
-from tqdm import tqdm
 from evaluation.BlandAltmanPy import BlandAltman
 
 def read_label(dataset):
@@ -49,7 +48,7 @@ def calculate_metrics(predictions, labels, config):
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
     SNR_all = list()
-    for index in tqdm(predictions.keys(), ncols=80):
+    for index in predictions.keys():
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
 
@@ -102,7 +101,7 @@ def calculate_metrics(predictions, labels, config):
         raise ValueError('Metrics.py evaluation only supports train_and_test and only_test!')
     
     if config.INFERENCE.EVALUATION_METHOD == "FFT":
-        print("Ground Truth:", list(gt_hr_fft_all)[0])
+        print("Ground Truth Heart Rate:", list(gt_hr_fft_all)[0])
         print("Predicted Heart Rate:", list(predict_hr_fft_all)[0])
         gt_hr_fft_all = np.array(gt_hr_fft_all)
         predict_hr_fft_all = np.array(predict_hr_fft_all)
@@ -112,7 +111,7 @@ def calculate_metrics(predictions, labels, config):
             if metric == "MAE":
                 MAE_FFT = np.mean(np.abs(predict_hr_fft_all - gt_hr_fft_all))
                 standard_error = np.std(np.abs(predict_hr_fft_all - gt_hr_fft_all)) / np.sqrt(num_test_samples)
-                print("FFT MAE (FFT Label): {0} +/- {1}".format(MAE_FFT, standard_error))
+                print("HR FFT MAE: {0} +/- {1}".format(MAE_FFT, standard_error))
             elif metric == "RMSE":
                 RMSE_FFT = np.sqrt(np.mean(np.square(predict_hr_fft_all - gt_hr_fft_all)))
                 standard_error = np.std(np.square(predict_hr_fft_all - gt_hr_fft_all)) / np.sqrt(num_test_samples)
