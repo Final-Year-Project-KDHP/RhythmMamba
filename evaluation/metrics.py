@@ -102,8 +102,8 @@ def calculate_metrics(predictions, labels, config):
         raise ValueError('Metrics.py evaluation only supports train_and_test and only_test!')
     
     if config.INFERENCE.EVALUATION_METHOD == "FFT":
-        print("Ground Truths:", list(gt_hr_fft_all))
-        print("Predicted Heart Rates:", list(predict_hr_fft_all))
+        print("Ground Truth:", list(gt_hr_fft_all)[0])
+        print("Predicted Heart Rate:", list(predict_hr_fft_all)[0])
         gt_hr_fft_all = np.array(gt_hr_fft_all)
         predict_hr_fft_all = np.array(predict_hr_fft_all)
         SNR_all = np.array(SNR_all)

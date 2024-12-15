@@ -13,6 +13,10 @@ from unsupervised_methods.unsupervised_predictor import unsupervised_predict
 from torch.utils.data import DataLoader
 import os 
 
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning)
+
 RANDOM_SEED = 100
 torch.manual_seed(RANDOM_SEED)
 torch.cuda.manual_seed(RANDOM_SEED)
@@ -122,8 +126,8 @@ if __name__ == "__main__":
 
     # configurations.
     config = get_config(args)
-    print('Configuration:')
-    print(config, end='\n\n')
+    # print('Configuration:')
+    # print(config, end='\n\n')
 
     data_loader_dict = dict()
     if config.TOOLBOX_MODE == "train_and_test":

@@ -78,9 +78,9 @@ class BaseLoader(Dataset):
                 self.build_file_list_retroactive(self.raw_data_dirs, config_data.BEGIN, config_data.END)
                 print('File list generated.', end='\n\n')
             self.load_preprocessed_data()
-        print('Cached Data Path', self.cached_path, end='\n\n')
-        print('File List Path', self.file_list_path)
-        print(f" {self.dataset_name} Preprocessed Dataset Length: {self.preprocessed_data_len}", end='\n\n')
+        # print('Cached Data Path', self.cached_path, end='\n\n')
+        # print('File List Path', self.file_list_path)
+        # print(f" {self.dataset_name} Preprocessed Dataset Length: {self.preprocessed_data_len}", end='\n\n')
 
     def __len__(self):
         """Returns the length of the dataset."""
