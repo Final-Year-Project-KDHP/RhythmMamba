@@ -59,6 +59,7 @@ class RhythmMambaTrainer(BaseTrainer):
             for idx, batch in enumerate(tbar):
                 tbar.set_description("Train epoch %s" % epoch)
                 data, labels = batch[0].float(), batch[1].float()
+                labels = np.squeeze(labels[:, 0:1, :])
                 N, D, C, H, W = data.shape
 
                 if self.config.TRAIN.AUG :
@@ -109,6 +110,7 @@ class RhythmMambaTrainer(BaseTrainer):
             for valid_idx, valid_batch in enumerate(vbar):
                 vbar.set_description("Validation")
                 data_valid, labels_valid = valid_batch[0].to(self.device), valid_batch[1].to(self.device)
+                labels_valid = np.squeeze(labels_valid[:, 0:1, :])
                 N, D, C, H, W = data_valid.shape
                 pred_ppg_valid = self.model(data_valid)
                 pred_ppg_valid = (pred_ppg_valid-torch.mean(pred_ppg_valid, axis=-1).view(-1, 1))/torch.std(pred_ppg_valid, axis=-1).view(-1, 1)    # normalize
@@ -157,7 +159,7 @@ class RhythmMambaTrainer(BaseTrainer):
                 data_test, labels_test = test_batch[0].to(self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
                 pred_ppg_test = self.model(data_test)
                 pred_ppg_test = (pred_ppg_test-torch.mean(pred_ppg_test, axis=-1).view(-1, 1))/torch.std(pred_ppg_test, axis=-1).view(-1, 1)    # normalize
-                labels_test = labels_test.view(-1, 1)
+                labels_test = np.squeeze(labels_test[:, 0:1, :])
                 pred_ppg_test = pred_ppg_test.view( -1 , 1)
                 for ib in range(batch_size):
                     subj_index = test_batch[2][ib]
