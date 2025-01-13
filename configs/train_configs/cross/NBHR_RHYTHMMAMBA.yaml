@@ -5,11 +5,10 @@ TRAIN:
   EPOCHS: 30
   LR: 9e-3
   MODEL_FILE_NAME: NBHR_rhythmmamba_standardized
-  PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
     DATASET: NBHR
-    DO_PREPROCESS: True            # if first time, should be true
+    DO_PREPROCESS: False            # if first time, should be true
     DATA_FORMAT: NDCHW
     DATA_PATH: "/content/drive/MyDrive/Datasets/NBHR"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/content/drive/MyDrive/HR/RhythmMamba/NBHR_cache"    # Processed dataset save path, need to be updated
@@ -38,7 +37,7 @@ VALID:
   DATA:
     FS: 30
     DATASET: NBHR
-    DO_PREPROCESS: True                # if first time, should be true
+    DO_PREPROCESS: False                # if first time, should be true
     DATA_FORMAT: NDCHW
     DATA_PATH: "/content/drive/MyDrive/Datasets/NBHR"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/content/drive/MyDrive/HR/RhythmMamba/NBHR_cache"    # Processed dataset save path, need to be updated
@@ -69,7 +68,7 @@ TEST:
   DATA:
     FS: 30
     DATASET: NBHR
-    DO_PREPROCESS: True                  # if first time, should be true
+    DO_PREPROCESS: False                  # if first time, should be true
     DATA_FORMAT: NDCHW
     DATA_PATH: "/content/drive/MyDrive/Datasets/NBHR"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/content/drive/MyDrive/HR/RhythmMamba/NBHR_cache"    # Processed dataset save path, need to be updated
