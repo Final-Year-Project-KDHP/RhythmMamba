@@ -324,7 +324,23 @@ class RhythmMamba(nn.Module):
 
         rPPG = x.permute(0,2,1) 
         rPPG = self.upsample(rPPG)
-        rPPG = self.ConvBlockLast(rPPG)    #[N, 1, D]
-        rPPG = rPPG.squeeze(1)
+        rPPG_conv = self.ConvBlockLast(rPPG)    #[N, 1, D]
+        rPPG = rPPG_conv.squeeze(1)
+        rPPG_conv = rPPG_conv.transpose(0,2,1)
 
-        return rPPG
+        input_BN = BatchNormalization(axis=-1, name="HR_BN_input")(rPPG_conv)
+        lstm_1 = Bidirectional(LSTM(32, return_sequences=True), name="HR_bilstm1")(input_BN)
+        lstm_2 = Bidirectional(LSTM(24, return_sequences=True),
+                               name="HR_bilstm2")(lstm_1)
+        lstm_3 = Bidirectional(LSTM(8, return_sequences=True),
+                               name="HR_bilstm3")(lstm_2)
+        lstm_4 = LSTM(1, return_sequences=True, name="HR_lstm_4")(lstm_3)
+
+        HR_lstm_squeez = Reshape((60,), name="HR_reshape")(lstm_4)
+
+        dense_1 = Dense(32, activation="tanh", kernel_regularizer=regularizers.l2(0.001), name="HR_dense_1")(
+            HR_lstm_squeez)
+        dense_1 = Dropout(0.25, name="HR_dropout_1")(dense_1)
+        HR_out = Dense(1, activation="relu", name="HR_out")(dense_1)
+
+        return rPPG, HR_out
